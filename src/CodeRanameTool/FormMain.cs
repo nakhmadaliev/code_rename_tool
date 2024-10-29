@@ -13,9 +13,14 @@ namespace CodeRanameTool
 {
     public partial class FormMain : Form
     {
+        private int _replacedFileCount = 0;
+        private int _renamedFileCount = 0;
+        private int _renamedDirCount = 0;
+
         public FormMain()
         {
             InitializeComponent();
+            Text += $" {GetType().Assembly.GetName().Version.ToString(3)}";
         }
 
         private void btnSelectFolder_Click(object sender, EventArgs e)
@@ -28,6 +33,9 @@ namespace CodeRanameTool
 
         private void ResetLblMessage()
         {
+            _replacedFileCount = 0;
+            _renamedFileCount = 0;
+            _renamedDirCount = 0;
             lblMessage.Text = "";
             lblMessage.ForeColor = Color.Gray;
         }
@@ -38,7 +46,7 @@ namespace CodeRanameTool
 
             if (string.IsNullOrEmpty(txbSourceText.Text) || string.IsNullOrEmpty(txbNewText.Text) || string.IsNullOrEmpty(txbFolder.Text))
             {
-                lblMessage.Text = "Not filled any textbox";
+                lblMessage.Text = "All textboxes are not filled";
                 lblMessage.ForeColor = Color.Red;
                 return;
             }
@@ -51,7 +59,7 @@ namespace CodeRanameTool
             }
 
             RunReplaceDir(txbFolder.Text);
-            lblMessage.Text = "Success";
+            lblMessage.Text = $"Success. Replaced files: {_replacedFileCount}, renamed files: {_renamedFileCount}, renamed dirs: {_renamedDirCount}";
             lblMessage.ForeColor = Color.Green;
         }
 
@@ -62,9 +70,14 @@ namespace CodeRanameTool
             {
                 if (chbRenameFileContent.Checked)
                 {
-                    string fileContent = File.ReadAllText(f);
-                    fileContent = fileContent.Replace(txbSourceText.Text, txbNewText.Text);
-                    File.WriteAllText(f, fileContent);
+                    string fileContent = File.ReadAllText(f, Encoding.UTF8);
+                    string newFileContent = fileContent.Replace(txbSourceText.Text, txbNewText.Text);
+
+                    if (newFileContent != fileContent)
+                    {
+                        File.WriteAllText(f, newFileContent, Encoding.UTF8);
+                        _replacedFileCount++;
+                    }
                 }
 
                 if (chbRenameFileNames.Checked)
@@ -72,7 +85,10 @@ namespace CodeRanameTool
                     var fileInfo = new FileInfo(f);
                     string newFileName = fileInfo.Name.Replace(txbSourceText.Text, txbNewText.Text);
                     if (newFileName != fileInfo.Name)
+                    {
                         File.Move(f, Path.Combine(fileInfo.DirectoryName, newFileName));
+                        _renamedFileCount++;
+                    }
                 }
             }
 
@@ -85,7 +101,10 @@ namespace CodeRanameTool
                     var dirInfo = new DirectoryInfo(d);
                     string newDirName = dirInfo.Name.Replace(txbSourceText.Text, txbNewText.Text);
                     if (newDirName != dirInfo.Name)
+                    {
                         Directory.Move(d, Path.Combine(dirInfo.Parent.FullName, newDirName));
+                        _renamedDirCount++;
+                    }
                 }
             }
         }

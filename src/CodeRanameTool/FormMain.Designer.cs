@@ -154,9 +154,11 @@ namespace CodeRanameTool
             // lblMessage
             // 
             this.lblMessage.AutoSize = true;
-            this.lblMessage.Location = new System.Drawing.Point(369, 304);
+            this.lblMessage.Location = new System.Drawing.Point(213, 304);
+            this.lblMessage.MinimumSize = new System.Drawing.Size(350, 0);
             this.lblMessage.Name = "lblMessage";
-            this.lblMessage.Size = new System.Drawing.Size(0, 13);
+            this.lblMessage.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.lblMessage.Size = new System.Drawing.Size(350, 13);
             this.lblMessage.TabIndex = 11;
             this.lblMessage.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
